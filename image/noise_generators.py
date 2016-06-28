@@ -9,7 +9,8 @@ import copy
 
 def add_gaussian_noise_to_image(img,variance):
     
-    return threshold(img+np.random.normal(0,variance+0.00000000000000000000001,img.shape),0)
+    tmp=threshold(img+np.random.normal(0,variance+0.00000000000000000000001,img.shape),0)
+    return (tmp,copy.deepcopy(tmp))
 
 
 def add_sparse_noise_to_image(img, probability, noise_generator=(lambda s: np.random.uniform(0,1,(s,1)))):
