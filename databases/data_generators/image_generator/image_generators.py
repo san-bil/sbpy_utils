@@ -197,7 +197,7 @@ class GroupedImageGenerator2:
         img_paths=[]
         imgs=[]
         pipeline_oos=[];
-        print('GroupedImageGenerator');
+        #print('GroupedImageGenerator');
         for i in range(0,len(self.file_lists)):
             mij_path = self.file_lists[i][idx].strip()
         
