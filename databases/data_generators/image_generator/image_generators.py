@@ -240,7 +240,7 @@ class GroupedImageGenerator2:
             imgs.append(modified_img);
             img_paths.append(mij_path);
         
-        print('\n');
+        #print('\n');
 
         return (imgs, img_paths, pipeline_oos)
 
