@@ -13,7 +13,12 @@ def apply_func_pipeline_masked(input_arg, named_func_pipeline, mask=[], invert_m
     for pipeline_stage_name in named_func_pipeline:
         if(op.xor(invert_mask, (pipeline_stage_name in mask))):
             func_handle = named_func_pipeline[pipeline_stage_name]
-            tmp2=func_handle(tmp2)
+            tmp3=func_handle(tmp2)
+            if(isinstance(tmp3, tuple)):
+                tmp2=tmp3[0]
+            else:
+                tmp2=tmp3
+                
     return tmp2
 
 
