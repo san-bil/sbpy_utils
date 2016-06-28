@@ -49,5 +49,5 @@ def apply_func_pipeline_masked_wrapped(input_arg, named_func_pipeline, mask, inv
         
     
     output=tmp['operand']  
-    other_outputs= kv.kv_rm('operand',tmp);
+    other_outputs,_= kv.kv_rm('operand',tmp);
     return (output, other_outputs)
