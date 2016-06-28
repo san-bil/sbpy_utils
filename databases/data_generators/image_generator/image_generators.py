@@ -143,33 +143,33 @@ class GroupedImageGenerator2:
     def get(self, idx, pipeline_mask=[], invert_pipeline_mask=True):
         imgs=[]
         img_paths=[]
-        print('GroupedImageGenerator2');
+        #print('GroupedImageGenerator2');
         for i in range(0,len(self.file_lists)):
             mij_path = self.file_lists[i][idx].strip();
             
             if(self.enable_caching and (mij_path in self.img_cache)):
                 img = self.img_cache[mij_path];
-                print(mij_path+'(using cache) ; ')
+                #print(mij_path+'(using cache) ; ')
             elif(self.enable_caching and (not mij_path in self.img_cache)):
                 img = self.imreader_callback(mij_path);
                 self.img_cache[mij_path]=img
-                print(mij_path + '(caching) ; ');
+                #print(mij_path + '(caching) ; ');
             else:
                 img = self.imreader_callback(mij_path);
-                print(mij_path+' ; ');
+                #print(mij_path+' ; ');
             
            
             pp_cache_key=stringman.sanitize_string(mij_path+str(pipeline_mask)+str(invert_pipeline_mask));
             if(self.enable_pp_caching and kv_haskey(pp_cache_key,self.img_pp_cache)):
                 modified_img = self.img_pp_cache[pp_cache_key];
-                print(mij_path+'(using img_pp_cache) ; ');
+                #print(mij_path+'(using img_pp_cache) ; ');
             elif(self.enable_pp_caching and not (pp_cache_key in self.img_pp_cache)):
                 modified_img = apply_func_pipeline_masked(img, self.modification_pipelines[i], pipeline_mask, invert_pipeline_mask);
                 self.img_pp_cache = kv_set(pp_cache_key,modified_img,self.img_pp_cache);
-                print([mij_path,'(caching to img_pp_cache) ; ']);
+                #print([mij_path,'(caching to img_pp_cache) ; ']);
             else:
                 modified_img = apply_func_pipeline_masked(img, self.modification_pipelines[i], pipeline_mask, invert_pipeline_mask);
-                print([mij_path,' ; ']);
+                #print([mij_path,' ; ']);
             
             imgs.append(modified_img);
             img_paths.append(mij_path);
@@ -204,14 +204,14 @@ class GroupedImageGenerator2:
             
             if(self.enable_caching and self.img_cache[mij_path]):
                 img = self.img_cache[mij_path];
-                print(mij_path+'(using cache) ; ');
+                #print(mij_path+'(using cache) ; ');
             elif(self.enable_caching and not self.img_cache[mij_path]):
                 img = self.imreader_callback(mij_path);
                 self.img_cache[mij_path] = img
-                print(mij_path+'(caching) ; ')
+                #print(mij_path+'(caching) ; ')
             else:
                 img = self.imreader_callback(mij_path);
-                print(mij_path+' ; ');
+                #print(mij_path+' ; ');
             
             
             
@@ -220,19 +220,19 @@ class GroupedImageGenerator2:
             if(self.enable_pp_caching and (pp_cache_key in self.img_pp_cache)):
                 modified_img = self.img_pp_cache[pp_cache_key];
                 oo = self.img_pp_oo_cache[pp_cache_key]
-                print(mij_path+'(using img_pp_cache) ; ');
+                #print(mij_path+'(using img_pp_cache) ; ');
             elif(self.enable_pp_caching and not (pp_cache_key in self.img_pp_cache)):
                 chain_res = chain.apply_func_pipeline_masked_wrapped(img, self.structured_modification_pipelines[i], pipeline_mask, invert_pipeline_mask);
                 modified_img=chain_res[0]
                 oo=chain_res[1]
                 elf.img_pp_cache[pp_cache_key] = modified_img
                 self.img_pp_oo_cache[pp_cache_key] = oo
-                print(mij_path+'(caching to img_pp_cache) ; ')
+                #print(mij_path+'(caching to img_pp_cache) ; ')
             else:
                 chain_res = apply_func_pipeline_masked_wrapped(img, self.structured_modification_pipelines[i], pipeline_mask, invert_pipeline_mask);
                 modified_img=chain_res[0]
                 oo=chain_res[1]
-                print(mij_path+' ; ');
+                #print(mij_path+' ; ');
             
 
             
