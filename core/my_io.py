@@ -2,7 +2,7 @@ import string
 import csv
 import copy 
 import cPickle
-import scipy.io
+#import scipy.io
 import cloudpickle
 import file_system
 
@@ -23,10 +23,12 @@ def my_load(file_path):
     return cPickle.load( open(file_path, "rb" ) )
 
 def savemat(*args, **kwargs):
-    scipy.io.savemat(*args, **kwargs)
+    raise NotImplementedError()
+    #scipy.io.savemat(*args, **kwargs)
 
 def loadmat(*args, **kwargs):
-    return scipy.io.loadmat(*args, **kwargs)
+    raise NotImplementedError()
+    #return scipy.io.loadmat(*args, **kwargs)
 
 def easy_file_append_num(arr,file_path):
     text= ''.join(map(lambda(tmp):('%d\n' % tmp),arr))
