@@ -1,11 +1,7 @@
-import os
-import copy
-import sys
+import os, time, copy, sys
 from scipy.misc import imread
-import time
 import sbpy_utils.core.sets
 import numpy as np
-
 import sbpy_utils.core.string_manipulation as stringman
 from sbpy_utils.core.string_manipulation import concat_string_list,filter_empty_strings
 from sbpy_utils.core.key_val import *
@@ -13,6 +9,7 @@ from sbpy_utils.core.command_line import my_system
 import sbpy_utils.core.my_io
 from sbpy_utils.core.chaining import *
 from sbpy_utils.image.my_io import imread_safe
+
 
 
 def get_grouped_image_generator2(folder, glob_matchers,grouper,use_cache_file,ban_files, ban_list, opts={}):
@@ -97,7 +94,7 @@ class GroupedImageGenerator2:
         self.img_pp_cache={}
         self.img_pp_oo_cache={}
         self.img_cache={}
-        self.opts={} 
+        self.opts={}
 
     def group_lists(self,get_key_callback):
         new_file_lists=sbmat_core.sets.group_by(self.file_lists,get_key_callback);
@@ -177,7 +174,24 @@ class GroupedImageGenerator2:
             imgs.append(modified_img);
             img_paths.append(mij_path);
         return (imgs, img_paths)
-                
+    
+    
+    def gets(self, idxs, io_pool, pipeline_mask=[], invert_pipeline_mask=True):
+        f = lambda idx: self.get(idx, pipeline_mask, invert_pipeline_mask)
+        data_objs = io_pool.map(f,idxs)
+        return data_objs
+    
+    def structured_gets(self, idxs, io_pool, pipeline_mask=[], invert_pipeline_mask=True):
+        f = lambda idx: self.stuctured_get(idx, pipeline_mask, invert_pipeline_mask)
+        data_objs_tmp = io_pool.map(f,idxs)        
+        
+        data_obj_tmp,data_paths_tmp,data_obj_oos_tmp = [list(c) for c in zip(*data_objs_tmp)]
+        
+        data_obj,data_paths,data_obj_oos=[list(x) for x in zip(*data_obj_tmp)],[list(x) for x in zip(*data_paths_tmp)],[list(x) for x in zip(*data_obj_oos_tmp)]
+        
+        
+        return (data_obj,data_paths,data_obj_oos)
+               
     def stuctured_get(self, idx, pipeline_mask=[], invert_pipeline_mask=True):
 
         img_paths=[]
