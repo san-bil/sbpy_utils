@@ -1,7 +1,6 @@
-import string
-import csv
-import copy
+import string,csv,copy,collections
 from .command_line import touch
+from collections import OrderedDict
 
 def dict_filter(key_list, kvm):
     return dict((k, kvm[k]) for k in key_list if k in kvm)
@@ -61,7 +60,13 @@ def kv_get_vals(kvm):
     return out
 
 def kv_apply(kvm,func):
-    return {k: func(kvm[k]) for k in kvm}
+    if(isinstance(kvm, OrderedDict)):
+        tmp = OrderedDict()
+        for key in kvm:
+            tmp[key]=func(kvm[key])
+        return tmp
+    else:
+        return {k: func(kvm[k]) for k in kvm}
 
 def kv_set_recurse(keylist,val,kvm):
     curr=kvm
@@ -145,7 +150,7 @@ def kv_wrap_call(fhandle,keys,kvm={}):
         
     fhandle_res=fhandle()
     if(isinstance(fhandle_res, tuple)):
-        {keys[i]:fhandle_res[i] for i in range(0,len(keys))}
+        return {keys[i]:fhandle_res[i] for i in range(0,len(keys))}
     else:
         if(len(keys)==1):
             return {keys[0]:fhandle_res}
