@@ -79,7 +79,7 @@ def kv_set_recurse(keylist,val,kvm):
             else:
                 curr[keylist[i]]=val
             curr=curr[keylist[i]]
-    return curr
+    return kvm
 
 def kv_get_recurse(keylist,kvm,default=None):
     curr=kvm
