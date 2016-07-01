@@ -1,4 +1,4 @@
-import os, time, copy, sys
+import os, time, copy, sys,threading
 from scipy.misc import imread
 import sbpy_utils.core.sets
 import numpy as np
@@ -9,7 +9,7 @@ from sbpy_utils.core.command_line import my_system
 import sbpy_utils.core.my_io
 from sbpy_utils.core.chaining import *
 from sbpy_utils.image.my_io import imread_safe
-
+from Queue import Queue
 
 
 def get_grouped_image_generator2(folder, glob_matchers,grouper,use_cache_file,ban_files, ban_list, opts={}):
@@ -176,6 +176,46 @@ class GroupedImageGenerator2:
         return (imgs, img_paths)
     
     
+    def start_fill(self,batchsize,sample_idxs_getter,io_pool,queuesize=6,pipeline_mask=[], invert_pipeline_mask=True):
+        self.read_queue = Queue(maxsize=queuesize)
+        self.worker_threads_events=[]
+        self.worker_threads=[]
+        def structured_gets_loop(queue_obj,event_obj,thr_io_pool):
+            while True:
+                samples_idxs=sample_idxs_getter()
+                data_obj,data_paths,data_obj_oos = self.structured_gets(samples_idxs, thr_io_pool, pipeline_mask, invert_pipeline_mask)
+                queue_obj.put( {'data_obj':data_obj,'data_paths':data_paths,'data_obj_oos':data_obj_oos,'samples_idxs':samples_idxs} )
+
+                event_is_set = event_obj.wait()
+ 
+        num_threads=1
+        
+        for i in range(num_threads):
+            worker_event = threading.Event()
+            worker_event.set()
+            worker = threading.Thread(target=structured_gets_loop, args=(self.read_queue,worker_event,io_pool))
+            worker.setDaemon(True)
+            self.worker_threads.append(worker)
+            self.worker_threads_events.append(worker_event)
+            worker.start()
+        
+    def structured_gets_from_q(self):
+        res=self.read_queue.get()
+        rq=self.read_queue
+        item_consumed_handle = lambda: rq.task_done()
+        return (res,item_consumed_handle)
+        
+    
+    def pause_fill(self):
+        for event_obj in self.worker_threads_events:
+            event_obj.clear()
+        with self.read_queue.mutex:
+            self.read_queue.queue.clear()        
+    
+    def resume_fill(self):
+        for event_obj in self.worker_threads_events:
+            event_obj.set()    
+
     def gets(self, idxs, io_pool, pipeline_mask=[], invert_pipeline_mask=True):
         f = lambda idx: self.get(idx, pipeline_mask, invert_pipeline_mask)
         data_objs = io_pool.map(f,idxs)
