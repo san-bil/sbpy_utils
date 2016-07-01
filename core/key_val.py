@@ -212,7 +212,7 @@ def kv_print_keys_recurse(kvm,depth=0):
         
         
 def kv_cwn(*args):
-    res={}
+    res=OrderedDict()
     for i in range(0,len(args),2):
         res[args[i]]=args[i+1]
     return res
