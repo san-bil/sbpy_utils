@@ -26,6 +26,7 @@ def add_sparse_noise_to_image(img, probability, noise_generator=(lambda s: np.ra
     if(len(img.shape)<3):
         layer = noisy_img.flatten()
         layer[bernoulli_mask.flatten()]=noise
+        noisy_img=layer
     else:
         for i in range(0,(img.shape[2])):
             layer = img[:,:,i].flatten()

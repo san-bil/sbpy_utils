@@ -176,7 +176,7 @@ class GroupedImageGenerator2:
         return (imgs, img_paths)
     
     
-    def start_fill(self,batchsize,sample_idxs_getter,io_pool,queuesize=6,pipeline_mask=[], invert_pipeline_mask=True):
+    def start_fill(self,batchsize,sample_idxs_getter,io_pool,queuesize=10,pipeline_mask=[], invert_pipeline_mask=True):
         self.read_queue = Queue(maxsize=queuesize)
         self.worker_threads_events=[]
         self.worker_threads=[]
@@ -185,7 +185,7 @@ class GroupedImageGenerator2:
                 samples_idxs=sample_idxs_getter()
                 data_obj,data_paths,data_obj_oos = self.structured_gets(samples_idxs, thr_io_pool, pipeline_mask, invert_pipeline_mask)
                 queue_obj.put( {'data_obj':data_obj,'data_paths':data_paths,'data_obj_oos':data_obj_oos,'samples_idxs':samples_idxs} )
-
+                
                 event_is_set = event_obj.wait()
  
         num_threads=1
@@ -202,7 +202,7 @@ class GroupedImageGenerator2:
     def structured_gets_from_q(self):
         res=self.read_queue.get()
         rq=self.read_queue
-        item_consumed_handle = lambda: rq.task_done()
+        item_consumed_handle = rq.task_done
         return (res,item_consumed_handle)
         
     
@@ -223,7 +223,7 @@ class GroupedImageGenerator2:
     
     def structured_gets(self, idxs, io_pool, pipeline_mask=[], invert_pipeline_mask=True):
         f = lambda idx: self.stuctured_get(idx, pipeline_mask, invert_pipeline_mask)
-        data_objs_tmp = io_pool.map(f,idxs)        
+        data_objs_tmp = io_pool.map(f,idxs)
         
         data_obj_tmp,data_paths_tmp,data_obj_oos_tmp = [list(c) for c in zip(*data_objs_tmp)]
         
@@ -240,7 +240,7 @@ class GroupedImageGenerator2:
         #print('GroupedImageGenerator');
         for i in range(0,len(self.file_lists)):
             mij_path = self.file_lists[i][idx].strip()
-        
+            #print(mij_path)
             
             if(self.enable_caching and self.img_cache[mij_path]):
                 img = self.img_cache[mij_path];
@@ -274,14 +274,12 @@ class GroupedImageGenerator2:
                 oo=chain_res[1]
                 #print(mij_path+' ; ');
             
-
             
             pipeline_oos.append(oo);
             imgs.append(modified_img);
             img_paths.append(mij_path);
         
         #print('\n');
-
         return (imgs, img_paths, pipeline_oos)
 
 
