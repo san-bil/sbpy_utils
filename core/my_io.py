@@ -31,7 +31,7 @@ def loadmat(*args, **kwargs):
     #return scipy.io.loadmat(*args, **kwargs)
 
 def easy_file_append_num(arr,file_path):
-    text= ''.join(map(lambda(tmp):('%d\n' % tmp),arr))
+    text= ''.join(map(lambda(tmp):('%f\n' % tmp),arr))
     easy_file_append_fast(text,file_path)
     
     
