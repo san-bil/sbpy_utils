@@ -50,7 +50,8 @@ def group_by(lists,get_key_callback):
     
     lists_lengths = [len(x) for x in new_lists];
    
-    assert(sum([x==lists_lengths[1] for x in lists_lengths])==length(lists_lengths));
+    assert(sum([x==lists_lengths[1] for x in lists_lengths])==len(lists_lengths));
+    return new_lists
 
 def cartprod(*args):
     cartprod_res=[]
