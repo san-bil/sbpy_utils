@@ -16,7 +16,7 @@ def add_gaussian_noise_to_image(img,variance):
 def add_sparse_noise_to_image(img, probability, noise_generator=(lambda s: np.random.uniform(0,1,(s,1)))):
 
     img_area = (img.shape[0]*img.shape[1])
-    bernoulli_mask =  np.random.uniform(0,1,(img.shape[0],img.shape[1]))>probability
+    bernoulli_mask =  np.random.uniform(0,1,(img.shape[0],img.shape[1]))<probability
     
     noise = noise_generator(np.sum(bernoulli_mask));
     noisy_img = np.zeros(img.shape)
@@ -24,9 +24,9 @@ def add_sparse_noise_to_image(img, probability, noise_generator=(lambda s: np.ra
     orig_shape=img.shape
 
     if(len(img.shape)<3):
-        layer = noisy_img.flatten()
+        layer = img.flatten()
         layer[bernoulli_mask.flatten()]=noise
-        noisy_img=layer
+        noisy_img=layer.reshape(orig_shape)
     else:
         for i in range(0,(img.shape[2])):
             layer = img[:,:,i].flatten()
