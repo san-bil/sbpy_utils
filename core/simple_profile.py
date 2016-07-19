@@ -1,7 +1,7 @@
 import time
 from contextlib import contextmanager
-@contextmanager
 
+@contextmanager
 def timer(label):
     start = time.time()
     try:
