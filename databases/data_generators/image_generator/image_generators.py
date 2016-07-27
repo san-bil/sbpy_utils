@@ -1,4 +1,4 @@
-import os, time, copy, sys,threading, random,math
+import os, time, copy, sys,threading, random,math,itertools
 from scipy.misc import imread
 import sbpy_utils.core.sets
 import numpy as np
@@ -11,6 +11,10 @@ from sbpy_utils.core.chaining import *
 from sbpy_utils.image.my_io import imread_safe
 from Queue import Queue
 from pathos.pools import ThreadPool
+
+
+
+
 
 def get_grouped_image_generator2(folder, glob_matchers,grouper,use_cache_file,ban_files, ban_list, opts={}):
 
@@ -453,7 +457,7 @@ class VideoGenerator():
         
         processed_imgs=[None]*len(sliced_frame_list)
         for frame_idx,frame in enumerate(sliced_frame_list):
-            processed_img = apply_func_pipeline_masked(frame, self.modification_pipeline);
+            processed_img = apply_func_pipeline_masked(menpo_grayscale_to_rgb(frame), self.modification_pipeline);
             processed_imgs[frame_idx]=processed_img
         metadata={'video_path':vid_path,'time_idxs':time_idxs}
         return (processed_imgs, metadata)
@@ -759,4 +763,6 @@ def test_VideoGenerator():
     tmp=1
     
 #test_VideoGenerator()
+
+
 
