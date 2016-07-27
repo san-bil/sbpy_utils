@@ -1,7 +1,6 @@
 import string
 import csv
 import copy 
-import cPickle
 #import scipy.io
 import cloudpickle
 import file_system
@@ -20,7 +19,7 @@ def my_save(kvm,file_path):
     cloudpickle.dump( kvm, open(file_path, "wb" ) )
 
 def my_load(file_path):
-    return cPickle.load( open(file_path, "rb" ) )
+    return cloudpickle.load( open(file_path, "rb" ) )
 
 def savemat(*args, **kwargs):
     raise NotImplementedError()
