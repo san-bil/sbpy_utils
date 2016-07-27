@@ -15,7 +15,7 @@ def rightShift(tup, n):
 def pad_sequence_list(sequence_collection, pad_length,axis=0):
     padded_sequence_collection=[None]*len(sequence_collection)
     for i,seq in enumerate(sequence_collection):
-        len_diff=pad_length-seq.shape[0]
+        len_diff=pad_length-len(seq)
         new_seq=np.pad(seq, rightShift(((0,len_diff),)+tuple([(0,0)]*(seq.ndim-1)),axis), mode='constant', constant_values=0)
         padded_sequence_collection[i]=new_seq
     return padded_sequence_collection
