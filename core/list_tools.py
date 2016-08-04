@@ -13,6 +13,11 @@ def list_split(in_list,idxs):
     list_splits = [[in_list[tmp2] for tmp2 in tmp] for tmp in idx_chunks]
     return list_splits
 
+def list_transpose(in_list):
+    return [list(x) for x in zip(*in_list)]
+
+
+
 #def test_list_split():
     #mylist=['the', 'quick', 'brown', 'fox', 'jumped', 'over', 'the', 'lazy', 'dog']
     #print(list_split(mylist,[5]))
