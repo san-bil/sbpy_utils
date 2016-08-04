@@ -145,16 +145,20 @@ class SingleViewImgTree():
                or isinstance(self,Video) 
                or isinstance(self,VideoList))
         
-        if not padded_length is None:
-            if isinstance(self, VideoList):
-                sequence_lengths=self.sequence_lengths()
+        
+        if isinstance(self, VideoList):
+            
+            sequence_lengths=self.sequence_lengths()
+            if not padded_length is None:
                 splitpoints=np.cumsum(np.asarray([padded_length]*len(sequence_lengths)))
-                splitpoints=splitpoints[:-1]
-                split_tl=[np.array_split(tmp,tmp.shape[0],axis=0)[:sequence_lengths[idx2]] for idx2,tmp in enumerate(np.split(tensor,splitpoints,axis=0))]
-                split_tensor=list(itertools.chain.from_iterable(split_tl))
-            if isinstance(self, Video):
-                sequence_length=self.length
-                split_tensor=np.array_split(tensor,tensor.shape[0],axis=0)[:sequence_length]
+            else:
+                splitpoints=np.cumsum(sequence_lengths)
+            splitpoints=splitpoints[:-1]
+            split_tl=[np.array_split(tmp,tmp.shape[0],axis=0)[:sequence_lengths[idx2]] for idx2,tmp in enumerate(np.split(tensor,splitpoints,axis=0))]
+            split_tensor=list(itertools.chain.from_iterable(split_tl))
+        if isinstance(self, Video):
+            sequence_length=self.length
+            split_tensor=np.array_split(tensor,tensor.shape[0],axis=0)[:sequence_length]
 
                 
             
