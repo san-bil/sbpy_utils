@@ -4,9 +4,9 @@ import numpy as np
 def unit_denormalize_labels(label_col, real_range):
     return shift_array_min_max(label_col, real_range, [0, 1])
     
-def shift_array_min_max(array,new_bounds,real_range=np.asarray([0,0])):
+def shift_array_min_max(array,new_bounds,real_range=None):
     array=np.asarray(array)
-    if(np.all(real_range==np.asarray([0,0]))):
+    if real_range is None:
         empirical_min = np.min(array);
         empirical_max = np.max(array);
     else:
