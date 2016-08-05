@@ -426,14 +426,15 @@ def menpo_import_video_verbose(vp):
 class VideoGenerator3():
     def __init__(self,file_list, modification_pipeline=None, use_menpo_type=False):
         videos=OrderedDict()
-        self.file_list=file_list
+        file_list_filtered=[]
         
-        video_getter_pool=ThreadPool(nodes=4)
+        video_getter_pool=ThreadPool(nodes=8)
         mpio_obj_list = video_getter_pool.map(menpo_import_video_verbose,file_list)
         
         for vp,mpio_obj in zip(file_list,mpio_obj_list):
             if not mpio_obj is None:
                 videos[vp]=mpio_obj
+                file_list_filtered.append(vp)
         
         #for vp in file_list:
             #print('menpo.io.import_video importing %s' % vp)
@@ -444,7 +445,7 @@ class VideoGenerator3():
                 #print('menpo.io.import_video could not import %s' % vp)
                 #print(err)
                 
-                
+        self.file_list = file_list_filtered    
         self.videos=videos
         if not modification_pipeline is None:
             self.modification_pipeline=modification_pipeline
@@ -504,16 +505,17 @@ class GroupedVideoGenerator3:
                 self.video_lists.append(image_generators[i].videos)
                 fps=image_generators[i].fps
             elif(isinstance(image_generators[i],list)):
-                
-                video_getter_pool=ThreadPool(nodes=4)                
-                self.file_lists.append(image_generators[i]);
+                video_getter_pool=ThreadPool(nodes=8)                
                 tmp_mpio_obj_list=video_getter_pool.map(menpo_import_video_verbose, image_generators[i])
                 tmp_mpio_obj_list = [x for x in tmp_mpio_obj_list if x is not None]
+                safe_idxs = [idx for idx,x in enumerate(tmp_mpio_obj_list) if x is not None]
+                tmp_file_list=image_generators[i]
+                self.file_lists.append([tmp_file_list[safe_idx] for safe_idx in safe_idxs])                
                 self.video_lists.append(tmp_mpio_obj_list)
             else:
                 raise TypeError('You can only make a GroupedImageGenerator2 from a list of string-lists or ImageGenerator2s')
             
-            self.file_lists[i] = filter(None,self.file_lists[i]);
+            self.file_lists[i] = [tmp for tmp in self.file_lists[i] if not tmp is None]
         
         self.fps=fps
             
