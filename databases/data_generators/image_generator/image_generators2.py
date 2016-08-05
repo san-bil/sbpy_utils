@@ -415,6 +415,7 @@ class VideoGenerator3():
         videos=OrderedDict()
         self.file_list=file_list
         for vp in file_list:
+            print('menpo.io.import_video importing %s' % vp)
             mpio_obj=menpo.io.import_video(vp, exact_frame_count=False, normalise=False)
             videos[vp]=mpio_obj
         self.videos=videos
@@ -477,7 +478,10 @@ class GroupedVideoGenerator3:
                 fps=image_generators[i].fps
             elif(isinstance(image_generators[i],list)):
                 self.file_lists.append(image_generators[i]);
-                tmp_mpio_obj_list=map(lambda vp:menpo.io.import_video(vp, exact_frame_count=False, normalise=False), image_generators[i])
+                def menpo_import_video_verbose(vp):
+                    print('menpo.io.import_video importing %s' % vp)
+                    return menpo.io.import_video(vp, exact_frame_count=False, normalise=False)
+                tmp_mpio_obj_list=map(menpo_import_video_verbose, image_generators[i])
                 self.video_lists.append(tmp_mpio_obj_list)
             else:
                 raise TypeError('You can only make a GroupedImageGenerator2 from a list of string-lists or ImageGenerator2s')
