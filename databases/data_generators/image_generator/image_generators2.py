@@ -410,18 +410,41 @@ class ImageGenerator3:
     def has_next(self):
         return self.ctr<length(self.file_list);
     
+def menpo_import_video_verbose(vp):
+    print('menpo.io.import_video importing %s' % vp)
+    try:
+        return (menpo.io.import_video(vp, 
+                                      exact_frame_count=False, 
+                                      normalise=False))
+    except Exception as err:
+        print('menpo.io.import_video could not import %s' % vp)
+        print(err)
+        return None
+
+
+
 class VideoGenerator3():
     def __init__(self,file_list, modification_pipeline=None, use_menpo_type=False):
         videos=OrderedDict()
         self.file_list=file_list
-        for vp in file_list:
-            print('menpo.io.import_video importing %s' % vp)
-            try:
-                mpio_obj=menpo.io.import_video(vp, exact_frame_count=False, normalise=False)
+        
+        video_getter_pool=ThreadPool(nodes=4)
+        mpio_obj_list = video_getter_pool.map(menpo_import_video_verbose,file_list)
+        
+        for vp,mpio_obj in zip(file_list,mpio_obj_list):
+            if not mpio_obj is None:
                 videos[vp]=mpio_obj
-            except Exception as err:
-                print('menpo.io.import_video could not import %s' % vp)
-                print(err)
+        
+        #for vp in file_list:
+            #print('menpo.io.import_video importing %s' % vp)
+            #try:
+                #mpio_obj=menpo.io.import_video(vp, exact_frame_count=False, normalise=False)
+                #videos[vp]=mpio_obj
+            #except Exception as err:
+                #print('menpo.io.import_video could not import %s' % vp)
+                #print(err)
+                
+                
         self.videos=videos
         if not modification_pipeline is None:
             self.modification_pipeline=modification_pipeline
@@ -481,15 +504,11 @@ class GroupedVideoGenerator3:
                 self.video_lists.append(image_generators[i].videos)
                 fps=image_generators[i].fps
             elif(isinstance(image_generators[i],list)):
+                
+                video_getter_pool=ThreadPool(nodes=4)                
                 self.file_lists.append(image_generators[i]);
-                def menpo_import_video_verbose(vp):
-                    print('menpo.io.import_video importing %s' % vp)
-                    try:
-                        return menpo.io.import_video(vp, exact_frame_count=False, normalise=False)
-                    except Exception as err:
-                        print('menpo.io.import_video could not import %s' % vp)
-                        print(err)
-                tmp_mpio_obj_list=map(menpo_import_video_verbose, image_generators[i])
+                tmp_mpio_obj_list=video_getter_pool.map(menpo_import_video_verbose, image_generators[i])
+                tmp_mpio_obj_list = [x for x in tmp_mpio_obj_list if x is not None]
                 self.video_lists.append(tmp_mpio_obj_list)
             else:
                 raise TypeError('You can only make a GroupedImageGenerator2 from a list of string-lists or ImageGenerator2s')
