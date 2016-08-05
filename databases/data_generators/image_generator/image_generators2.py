@@ -416,8 +416,12 @@ class VideoGenerator3():
         self.file_list=file_list
         for vp in file_list:
             print('menpo.io.import_video importing %s' % vp)
-            mpio_obj=menpo.io.import_video(vp, exact_frame_count=False, normalise=False)
-            videos[vp]=mpio_obj
+            try:
+                mpio_obj=menpo.io.import_video(vp, exact_frame_count=False, normalise=False)
+                videos[vp]=mpio_obj
+            except Exception as err:
+                print('menpo.io.import_video could not import %s' % vp)
+                print(err)
         self.videos=videos
         if not modification_pipeline is None:
             self.modification_pipeline=modification_pipeline
@@ -480,7 +484,11 @@ class GroupedVideoGenerator3:
                 self.file_lists.append(image_generators[i]);
                 def menpo_import_video_verbose(vp):
                     print('menpo.io.import_video importing %s' % vp)
-                    return menpo.io.import_video(vp, exact_frame_count=False, normalise=False)
+                    try:
+                        return menpo.io.import_video(vp, exact_frame_count=False, normalise=False)
+                    except Exception as err:
+                        print('menpo.io.import_video could not import %s' % vp)
+                        print(err)
                 tmp_mpio_obj_list=map(menpo_import_video_verbose, image_generators[i])
                 self.video_lists.append(tmp_mpio_obj_list)
             else:
