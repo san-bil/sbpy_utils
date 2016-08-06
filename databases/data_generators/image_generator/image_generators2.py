@@ -496,7 +496,7 @@ class GroupedVideoGenerator3:
 
 
     def __init__(self, 
-                 image_generators,
+                 image_generators=[],
                  fps=None,
                  modification_pipelines=None,
                  structured_modification_pipelines=None,
@@ -539,8 +539,8 @@ class GroupedVideoGenerator3:
         self.opts = opts
         self.use_menpo_type = use_menpo_type
         
-    def copy(self):
-        ret_val=GroupedImageGenerator3([],
+    def copy3(self):
+        ret_val=GroupedVideoGenerator3([],
                                        fps=self.fps,
                                        modification_pipelines=self.modification_pipelines,
                                        structured_modification_pipelines=self.structured_modification_pipelines,
