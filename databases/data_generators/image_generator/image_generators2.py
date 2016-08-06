@@ -495,9 +495,16 @@ class VideoGenerator3():
 class GroupedVideoGenerator3:
 
 
-    def __init__(self, image_generators,fps=None,modification_pipelines=None,structured_modification_pipelines=None,use_menpo_type=False):
+    def __init__(self, 
+                 image_generators,
+                 fps=None,
+                 modification_pipelines=None,
+                 structured_modification_pipelines=None,
+                 use_menpo_type=False,
+                 opts={}):
         self.video_lists=[]
         self.file_lists=[]
+        print('GroupedVideoGenerator3()')
         for i in range(0,len(image_generators)):
             if(isinstance(image_generators[i], VideoGenerator3)):
                 assert(isinstance(image_generators[i].videos, OrderedDict))
@@ -513,24 +520,36 @@ class GroupedVideoGenerator3:
                 self.file_lists.append([tmp_file_list[safe_idx] for safe_idx in safe_idxs])                
                 self.video_lists.append(tmp_mpio_obj_list)
             else:
-                raise TypeError('You can only make a GroupedImageGenerator2 from a list of string-lists or ImageGenerator2s')
+                raise TypeError('You can only make a GroupedImageGenerator2 '+\
+                                'from a list of string-lists or ImageGenerator2s')
             
             self.file_lists[i] = [tmp for tmp in self.file_lists[i] if not tmp is None]
         
         self.fps=fps
-            
-
-        self.modification_pipelines=modification_pipelines if not modification_pipelines is None else {}
-        self.structured_modification_pipelines=structured_modification_pipelines if not structured_modification_pipelines is None else {}
+        self.modification_pipelines= \
+            modification_pipelines if not modification_pipelines is None else {}
+        self.structured_modification_pipelines= \
+            structured_modification_pipelines if not structured_modification_pipelines is None else {}
         self.io_pool = None
-        self.enable_caching=0;
-        self.enable_pp_caching=0;
-        self.img_pp_cache={}
-        self.img_pp_oo_cache={}
-        self.img_cache={}
-        self.opts={}
-        self.use_menpo_type=use_menpo_type
-
+        self.enable_caching = 0
+        self.enable_pp_caching = 0
+        self.img_pp_cache = {}
+        self.img_pp_oo_cache = {}
+        self.img_cache = {}
+        self.opts = opts
+        self.use_menpo_type = use_menpo_type
+        
+    def copy(self):
+        ret_val=GroupedImageGenerator3([],
+                                       fps=self.fps,
+                                       modification_pipelines=self.modification_pipelines,
+                                       structured_modification_pipelines=self.structured_modification_pipelines,
+                                       use_menpo_type=self.use_menpo_type,
+                                       opts=self.opts)
+        ret_val.file_lists = copy.copy(self.file_lists)
+        ret_val.video_lists = copy.copy(self.video_lists)
+        return ret_val
+        
     def group_lists(self,get_key_callback):
         
         new_file_lists=sbpy_utils.core.sets.group_by(self.file_lists,get_key_callback);
