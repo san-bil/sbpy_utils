@@ -644,7 +644,6 @@ class GroupedVideoGenerator3:
         self.worker_threads=[]
         def structured_get_loop(queue_obj,event_obj):
             while True:
-                print('fetching sequence')
                 grouped_video_lists = self.get_random_segment_group(pipeline_mask, invert_pipeline_mask,min_length,max_length,alpha,beta)
                 queue_obj.put( grouped_video_lists )
                 event_is_set = event_obj.wait()
@@ -703,7 +702,7 @@ class GroupedVideoGenerator3:
         segment_length=min(max_length,max(random.gammavariate(alpha,beta),min_length))*self.fps
         end_idx=int(np.round(start_idx+segment_length))
         time_idxs=range(start_idx,end_idx)
-        print('intended_segment length: '+str(len(time_idxs)))
+        #print('intended_segment length: '+str(len(time_idxs)))
         processed_segment = self.structured_get(file_group_idx,time_idxs,pipeline_mask,invert_pipeline_mask)
         print('processed_segment length: '+str(len(processed_segment)))
         return processed_segment

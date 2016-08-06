@@ -10,3 +10,12 @@ def timer(label):
         end = time.time()
         print('%s: %0.6f' % (label, end-start))
 
+
+@contextmanager
+def binary_progress_notifier(label):
+    print(label)
+    try:
+        yield
+    finally:
+        print('( %s ) - done!' % label)
+
