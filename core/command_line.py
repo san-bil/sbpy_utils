@@ -9,9 +9,9 @@ from string_manipulation import filter_empty_strings
 def get_default_ssh_key():
     return os.path.join(os.path.expanduser('~'),'.ssh/id_rsa')
 
-def my_system(cmd):
+def my_system(cmd, **kwargs):
 
-    out = check_output(cmd, stderr=subprocess.STDOUT, shell=True )
+    out = check_output(cmd, stderr=subprocess.STDOUT, shell=True, **kwargs)
     return out
 
 def chmod(filepath, permissions='755',host='localhost',ssh_key=get_default_ssh_key()):
