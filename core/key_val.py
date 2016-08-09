@@ -44,6 +44,23 @@ def kv_print(kvm,depth=0):
         else:
             print(('  ' * depth)+str(f)+" : "+str(kvm[f]))
 
+def kv_write_to_str_test():
+    x=OrderedDict()
+    x['a']='1'
+    x['b']='2'
+    x['c']=OrderedDict({'a':1,'b':2,c:{'x':23,'y':24,'z':25}})
+    x['d']=OrderedDict({'l':10,'m':12,c:{'p':20,'q':21,'r':22}})
+    new_str=kv_write_to_str(x)
+
+def kv_write_to_str(kvm,depth=0,acc=''):
+    for f in kvm:
+        if(isinstance(kvm[f],dict)):
+            acc += (str(f)+" : \n")
+            acc += kv_write_to_str(kvm[f],depth+1)
+        else:
+            acc+=(('  ' * depth)+str(f)+" : "+str(kvm[f])+'\n')
+    return acc
+
 def kv_get(key, kvm, default=None):
     if key in kvm:
         return kvm[key]
