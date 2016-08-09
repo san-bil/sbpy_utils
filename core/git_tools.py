@@ -8,7 +8,7 @@ def git_clone(repo,parent_folder,host='localhost',ssh_key=get_default_ssh_key())
     cmd = ' '.join(['git','clone',repo,repo_folder])
     
     if(islocalhost(host)):
-        cmd_res=system(cmd);    
+        cmd_res=my_system(cmd);    
     else:
         cmd_res=ssh_call(cmd,host,ssh_key);
 
@@ -24,3 +24,14 @@ def cwd_is_valid_git_repo():
     x=get_git_repo_root(os.getcwd());
     isvalid='fatal: Not a git repository' in x
     return isvalid
+
+
+def get_commit_hash(repo_path=os.getcwd()):
+    out = my_system(' '.join(['git', 'rev-parse', 'HEAD']), cwd=repo_path)
+    return out.strip()
+
+#def get_commit_hash_test():
+    #print(get_commit_hash(os.path.dirname(__file__)))
+    #tmp=1
+    
+#get_commit_hash_test()
