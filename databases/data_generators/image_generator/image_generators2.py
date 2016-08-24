@@ -36,7 +36,7 @@ def get_grouped_image_generator3(folder, glob_matchers,grouper,use_cache_file,ba
     return grouped_image_generator
 
 
-def get_grouped_video_generator3(folder, glob_matchers,grouper,use_cache_file,ban_files, ban_list, opts={}):
+def get_grouped_video_generator3(folder, glob_matchers,grouper,use_cache_file,ban_files, ban_list, opts={}, filter_handles=[]):
 
     igs = [];
     for i in range(0,len(glob_matchers)):
@@ -45,7 +45,7 @@ def get_grouped_video_generator3(folder, glob_matchers,grouper,use_cache_file,ba
         else:
             bf=ban_files[i]
         
-        ig = get_video_generator3(folder, glob_matchers[i],use_cache_file, bf, ban_list, opts);
+        ig = get_video_generator3(folder, glob_matchers[i],use_cache_file, bf, ban_list, opts, filter_handles);
         igs.append(ig);
 
     gig = GroupedVideoGenerator3(igs);
@@ -58,7 +58,7 @@ def get_grouped_video_generator3(folder, glob_matchers,grouper,use_cache_file,ba
 
     return grouped_image_generator
 
-def get_video_generator3(folder, glob_matcher,use_cache_file, ban_file, ban_list, opts):
+def get_video_generator3(folder, glob_matcher,use_cache_file, ban_file, ban_list, opts, filter_handles=[]):
 
 
     if not use_cache_file:
@@ -80,15 +80,25 @@ def get_video_generator3(folder, glob_matcher,use_cache_file, ban_file, ban_list
     clean_lines = [line.strip() for line in lines]
 
     if( not ban_file=='' ):
-        banned_images = filter_empty_strings(sbpy_utils.core.my_io.my_readlines(ban_file));
-        cleaned_lines_banfree = list(set(clean_lines).difference(set(banned_images)))	
+        try:
+            banned_images = filter_empty_strings(sbpy_utils.core.my_io.my_readlines(ban_file));
+            cleaned_lines_banfree = list(set(clean_lines).difference(set(banned_images)))	
+        except Exception as err:
+            print(err)
+            cleaned_lines_banfree=clean_lines
     else:
         cleaned_lines_banfree = clean_lines;
 
     if(len(ban_list)>0):
         cleaned_lines_banfree = stringman.multifilter_string_list(cleaned_lines_banfree,ban_list,1);
+        
+    cleaned_lines_banfree_satisfies_filters=[]
+    for l in cleaned_lines_banfree:
+        constraint_satisfaction=[f(l) for f in filter_handles]
+        if all(constraint_satisfaction) or constraint_satisfaction==[]:
+            cleaned_lines_banfree_satisfies_filters.append(l)
 
-    image_generator = VideoGenerator3(cleaned_lines_banfree);
+    image_generator = VideoGenerator3(cleaned_lines_banfree_satisfies_filters);
     return image_generator
 
 
